@@ -31,6 +31,28 @@
                 <version>5.12.1</version>
                 <scope>test</scope>
             </dependency>
+
+            <!--
+                Second test library for testing.
+            -->
+            <!-- https://mvnrepository.com/artifact/org.mockito/mockito-core -->
+            <dependency>
+                <groupId>org.mockito</groupId>
+                <artifactId>mockito-core</artifactId>
+                <version>5.16.1</version>
+                <scope>test</scope>
+            </dependency>
+
+            <!--
+                Library that improve Java lanuage itself.
+            -->
+            <!-- https://mvnrepository.com/artifact/org.projectlombok/lombok -->
+            <dependency>
+                <groupId>org.projectlombok</groupId>
+                <artifactId>lombok</artifactId>
+                <version>1.18.36</version>
+                <scope>provided</scope>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 
