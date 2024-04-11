@@ -1,0 +1,45 @@
+<!--
+    Configuration of logback.
+    See:
+        https://logback.qos.ch/manual/
+    File should be in classpath or
+    provided via parameter "-Dlogback.configurationFile=/path/to/logback.xml".
+-->
+<configuration>
+    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss, UTC} [%highlight(%-5level)] %logger %mdc: %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>logback.log</file>
+        <append>true</append>
+        <encoder>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss, UTC} [%-5level] %logger %mdc: %msg%n</pattern>
+        </encoder>
+        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+            <fileNamePattern>test.%d{yyyy-MM-dd}.%i.log</fileNamePattern>
+            <!--
+                Each file should be at most 1 MB, keep 7 days worth of history, but at most 1 GB.
+            -->
+            <maxHistory>7</maxHistory>            <!-- 7 days -->
+            <maxFileSize>1MB</maxFileSize>            <!-- Size of one history files. -->
+            <totalSizeCap>1GB</totalSizeCap>            <!-- Size of whole history files. -->
+        </rollingPolicy>
+    </appender>
+
+    <!--
+        Available log levels are:
+        TRACE, DEBUG, INFO, WARN, ERROR, OFF
+    -->
+    <root level="TRACE">
+        <appender-ref ref="STDOUT" />
+        <appender-ref ref="FILE" />
+    </root>
+
+    <!--
+        Overwrite root config.
+    -->
+    <logger name="pro.zavodnikov.examples" level="DEBUG" />
+</configuration>

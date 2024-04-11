@@ -7,6 +7,7 @@
     <version>1.0-SNAPSHOT</version>
 
     <properties>
+
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 
@@ -14,6 +15,8 @@
 
         <!-- LTS release. -->
         <maven.compiler.release>17</maven.compiler.release>
+
+        <mainClass>pro.zavodnikov.examples.LogLevels</mainClass>
     </properties>
 
     <dependencies>
@@ -25,13 +28,60 @@
             <version>6.1.2</version>
             <scope>test</scope>
         </dependency>
+
+        <!-- Popular logging library. Require backend (see profiles). -->
+        <!-- Source: https://mvnrepository.com/artifact/org.slf4j/slf4j-api -->
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+            <version>2.0.18</version>
+        </dependency>
     </dependencies>
+
+    <profiles>
+        <!-- Recommended backend for SLF4J (used by default). -->
+        <profile>
+            <id>slf4j-logback</id>
+
+            <dependencies>
+                <!--
+                    Required "logback.xml" in classpath or
+                    parameter "-Dlogback.configurationFile=/path/to/logback.xml".
+                -->
+                <!-- Source: https://mvnrepository.com/artifact/ch.qos.logback/logback-classic -->
+                <dependency>
+                    <groupId>ch.qos.logback</groupId>
+                    <artifactId>logback-classic</artifactId>
+                    <version>1.5.38</version>
+                </dependency>
+            </dependencies>
+        </profile>
+
+        <!-- Alternative backend for SLF4J. -->
+        <profile>
+            <id>slf4j-log4j</id>
+
+            <dependencies>
+                <!--
+                    Required "log4j.properties" in classpath or
+                    parameter "-Dlog4j.configuration=file:/path/to/log4j.properties".
+                -->
+                <!-- Source: https://mvnrepository.com/artifact/org.slf4j/slf4j-reload4j -->
+                <dependency>
+                    <groupId>org.slf4j</groupId>
+                    <artifactId>slf4j-reload4j</artifactId>
+                    <version>2.0.18</version>
+                </dependency>
+            </dependencies>
+        </profile>
+    </profiles>
 
     <build>
         <plugins>
             <!-- To generate proper archive. -->
             <!-- Ensure that you have a file "distribution.xml" in your "src/assembly" directory. -->
             <!-- Source: https://mvnrepository.com/artifact/org.apache.maven.plugins/maven-assembly-plugin -->
+            <!-- To generate proper archive. Ensure that you have a file "distribution.xml" in your root directory. -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-assembly-plugin</artifactId>
@@ -52,6 +102,24 @@
                         </goals>
                     </execution>
                 </executions>
+            </plugin>
+
+            <!-- To execute programs. -->
+            <!-- Source: https://mvnrepository.com/artifact/org.codehaus.mojo/exec-maven-plugin -->
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>exec-maven-plugin</artifactId>
+                <version>3.6.3</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>java</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <mainClass>${mainClass}</mainClass>
+                </configuration>
             </plugin>
         </plugins>
     </build>
