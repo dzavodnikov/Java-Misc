@@ -49,6 +49,17 @@ Print file size in human-readable format:
 1 Bytes
 ```
 
+## [examples](src/main/java/pro/zavodnikov/examples)
+
+### [LogLevels](src/main/java/pro/zavodnikov/examples/LogLevels.java)
+
+Example of [SLF4J](https://www.slf4j.org/) logging system. To run example execute:
+
+```sh
+$ mvn clean install exec:java -P slf4j-logback
+$ mvn clean install exec:java -P slf4j-log4j
+```
+
 ## License
 
 Distributed under MIT license.
