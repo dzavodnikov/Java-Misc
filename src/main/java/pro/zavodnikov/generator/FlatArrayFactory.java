@@ -25,10 +25,22 @@ package pro.zavodnikov.generator;
 
 import java.lang.reflect.InvocationTargetException;
 
+import net.bytebuddy.ByteBuddy;
+import net.bytebuddy.description.modifier.Visibility;
+import net.bytebuddy.dynamic.loading.ClassLoadingStrategy;
+import net.bytebuddy.implementation.FieldAccessor;
+import net.bytebuddy.implementation.FixedValue;
+import net.bytebuddy.implementation.MethodCall;
+import net.bytebuddy.implementation.MethodDelegation;
+import net.bytebuddy.matcher.ElementMatchers;
+
 /**
  * Flat Array factory.
  */
 public class FlatArrayFactory<T> extends FlatFactory<T> {
+
+    protected static final String SIZE_FIELD = "size";
+    protected static final String MY_VALUE_FIELD = "myValue";
 
     public FlatArrayFactory() {
         super("FlatArray");
@@ -45,7 +57,40 @@ public class FlatArrayFactory<T> extends FlatFactory<T> {
 
     @Override
     protected Class<?> createImpl(final ClassLoader classLoader, final Class<T> classDef) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'createImpl'");
+        try {
+            final Class<?> dynamicType = new ByteBuddy()
+                    // Interface for casting.
+                    .subclass(Object.class)
+                    .implement(classDef)
+                    .name(createClassName(classDef))
+                    // Internal field.
+                    .defineField(SIZE_FIELD, int.class, Visibility.PRIVATE)
+                    .defineField(MY_VALUE_FIELD, String.class, Visibility.PRIVATE)
+                    // Constructor.
+                    .defineConstructor(Visibility.PUBLIC)
+                    .withParameter(int.class)
+                    .intercept(MethodCall.invoke(Object.class.getConstructor())
+                            .andThen(FieldAccessor.ofField(SIZE_FIELD).setsArgumentAt(0)))
+                    // Getter for #size()
+                    .defineMethod("size", int.class)
+                    .intercept(FieldAccessor.ofField(SIZE_FIELD))
+                    // Getter for myValue.
+                    .defineMethod("getName", String.class)
+                    .intercept(MethodDelegation.to(StringAccessor.class))
+                    // Setter for myValue.
+                    .defineMethod("setName", void.class)
+                    .withParameter(String.class)
+                    .intercept(MethodDelegation.to(StringAccessor.class))
+                    // #toString method.
+                    .method(ElementMatchers.named("toString"))
+                    .intercept(FixedValue.value("Hello World!"))
+                    // Create class.
+                    .make()
+                    .load(classLoader, ClassLoadingStrategy.Default.INJECTION)
+                    .getLoaded();
+            return dynamicType;
+        } catch (NoSuchMethodException | IllegalArgumentException | SecurityException e) {
+            throw new RuntimeException(e);
+        }
     }
 }

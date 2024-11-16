@@ -23,9 +23,47 @@
  */
 package pro.zavodnikov.generator;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
+
+import org.junit.jupiter.api.Test;
+
 /**
  * Tests for {@link FlatArrayFactory}.
  */
 public class FlatArrayFactoryTest {
 
+    @Test
+    void testClassName() throws InstantiationException, IllegalAccessException {
+        final FlatArrayFactory<PersonArray> factory = new FlatArrayFactory<>();
+        final PersonArray arr = factory.createArray(PersonArray.class, 1);
+        assertEquals("FlatArray_of_PersonArray", arr.getClass().getSimpleName());
+    }
+
+    @Test
+    void testSize() throws InstantiationException, IllegalAccessException {
+        final FlatArrayFactory<PersonArray> factory = new FlatArrayFactory<>();
+        final PersonArray arr = factory.createArray(PersonArray.class, 5);
+        assertEquals(5, arr.size());
+    }
+
+    @Test
+    void testGetSet() throws InstantiationException, IllegalAccessException {
+        final FlatArrayFactory<PersonArray> factory = new FlatArrayFactory<>();
+        final PersonArray arr = factory.createArray(PersonArray.class, 1);
+
+        final String name = "John Doe";
+
+        assertNull(arr.getName());
+
+        arr.setName(name);
+        assertEquals(name, arr.getName());
+    }
+
+    @Test
+    void testToString() throws InstantiationException, IllegalAccessException {
+        final FlatArrayFactory<PersonArray> factory = new FlatArrayFactory<>();
+        final PersonArray obj = factory.createArray(PersonArray.class, 1);
+        assertEquals("Hello World!", obj.toString());
+    }
 }
