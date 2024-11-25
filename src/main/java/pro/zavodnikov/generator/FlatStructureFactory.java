@@ -23,18 +23,66 @@
  */
 package pro.zavodnikov.generator;
 
+import java.lang.reflect.InvocationTargetException;
+
+import net.bytebuddy.ByteBuddy;
+import net.bytebuddy.description.modifier.Visibility;
+import net.bytebuddy.dynamic.loading.ClassLoadingStrategy;
+import net.bytebuddy.implementation.FieldAccessor;
+
 /**
  * Flat structure factory.
  */
 public class FlatStructureFactory<T> extends FlatFactory<T> {
 
+    private static final String NAME_FIELD = "name"; // FIXME
+
     public FlatStructureFactory() {
-        super("FlatStruct");
+        super("FlatStructure");
     }
 
     @Override
-    Class<?> createImpl(final ClassLoader classLoader, final Class<T> classDef) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'createImpl'");
+    protected Class<?> createImpl(final ClassLoader classLoader, final Class<T> classDef) {
+        verifyClassLoader(classLoader);
+        verifyClassDefinition(classDef);
+
+        try {
+            final Class<?> dynamicType = new ByteBuddy()
+                    // Interface for casting.
+                    .subclass(Object.class)
+                    .implement(classDef)
+                    .name(createClassName(classDef))
+                    // Internal field.
+                    .defineField(NAME_FIELD, String.class, Visibility.PRIVATE)
+                    // Getter for myValue.
+                    .defineMethod("getName", String.class)
+                    .intercept(FieldAccessor.ofField(NAME_FIELD))
+                    // Setter for myValue.
+                    .defineMethod("setName", void.class)
+                    .withParameter(String.class)
+                    .intercept(FieldAccessor.ofField(NAME_FIELD))
+                    // Create class.
+                    .make()
+                    .load(classLoader, ClassLoadingStrategy.Default.INJECTION)
+                    .getLoaded();
+            return dynamicType;
+        } catch (IllegalArgumentException | SecurityException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    /**
+     * @param classDef describes how to data should be located into the memory;
+     * @return structure instance that was generated from class definition.
+     */
+    public T create(final Class<T> classDef) {
+        verifyClassDefinition(classDef);
+
+        try {
+            return classDef.cast(getImpl(classDef).getDeclaredConstructor().newInstance());
+        } catch (InstantiationException | IllegalAccessException | InvocationTargetException
+                | NoSuchMethodException e) {
+            throw new RuntimeException(e);
+        }
     }
 }

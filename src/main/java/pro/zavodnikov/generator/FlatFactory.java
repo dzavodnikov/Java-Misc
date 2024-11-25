@@ -54,6 +54,21 @@ public abstract class FlatFactory<T> {
         return String.format("%s_of_%s", getStructName(), classDef.getSimpleName());
     }
 
+    protected void verifyClassLoader(final ClassLoader classLoader) {
+        if (classLoader == null) {
+            throw new IllegalArgumentException("ClassLoader parameter should not be null");
+        }
+    }
+
+    protected void verifyClassDefinition(final Class<T> classDef) {
+        if (classDef == null) {
+            throw new IllegalArgumentException("Class definition parameter should not be null");
+        }
+        if (!classDef.isInterface()) {
+            throw new IllegalArgumentException("Class definition parameter should be an interface");
+        }
+    }
+
     /**
      * @param classLoader manage created class;
      * @param classDef    describes how to data should be located into the memory;
