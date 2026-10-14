@@ -2,6 +2,14 @@
 
 This code can be used as a template for other Java projects.
 
+## Compile
+
+Execute:
+
+```sh
+$ mvn clean package
+```
+
 ## [FileSize](src/main/java/pro/zavodnikov/utils/FileSize.java)
 
 Print file size in human-readable format:

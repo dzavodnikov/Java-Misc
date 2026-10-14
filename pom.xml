@@ -50,6 +50,51 @@
                     </execution>
                 </executions>
             </plugin>
+
+            <!-- Source: https://mvnrepository.com/artifact/org.apache.maven.plugins/maven-assembly-plugin -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-assembly-plugin</artifactId>
+                <version>3.8.0</version>
+                <executions>
+                    <!-- To generate fat JAR-file. -->
+                    <execution>
+                        <id>make-fat-jar</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>single</goal>
+                        </goals>
+                        <configuration>
+                            <descriptorRefs>
+                                <descriptorRef>jar-with-dependencies</descriptorRef>
+                            </descriptorRefs>
+                            <!--
+                            <archive>
+                                <manifest>
+                                    <mainClass>pro.zavodnikov.utils.Main</mainClass>
+                                </manifest>
+                            </archive>
+                            -->
+                        </configuration>
+                    </execution>
+                    <!--
+                        To generate proper archive.
+                        Ensure that you have a file "src/assembly/distribution.xml".
+                    -->
+                    <execution>
+                        <id>make-zip</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>single</goal>
+                        </goals>
+                        <configuration>
+                            <descriptors>
+                                <descriptor>src/assembly/distribution.xml</descriptor>
+                            </descriptors>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
         </plugins>
     </build>
 </project>
